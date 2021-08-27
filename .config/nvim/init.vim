@@ -19,6 +19,4 @@ source ~/.config/nvim/buffers.vim
 luafile ~/.config/nvim/bufferline.lua
 luafile ~/.config/nvim/indent.lua
 
-let delimitMate_expand_cr = 1
-
 vnoremap <c-/> :TComment<cr>

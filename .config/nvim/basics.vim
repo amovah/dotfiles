@@ -46,3 +46,5 @@ set scrolloff=8                                                                 
 set sidescrolloff=15
 set sidescroll=5
 set pyxversion=3                                                                "Always use python 3
+
+set clipboard+=unnamedplus " copy to system clipboard
