@@ -3,6 +3,7 @@ luafile ~/.config/nvim/go-lsp.lua
 luafile ~/.config/nvim/lsp-keybindings.lua
 source ~/.config/nvim/autocompletion-config.vim
 luafile ~/.config/nvim/lspsaga-config.lua
+luafile ~/.config/nvim/lspkind-nvim.lua
 luafile ~/.config/nvim/theme-config.lua
 
 " Theme

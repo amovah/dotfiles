@@ -4,6 +4,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/completion-nvim'
 Plug 'glepnir/lspsaga.nvim'
+Plug 'onsails/lspkind-nvim'
 
 " finder
 Plug 'nvim-lua/plenary.nvim'
