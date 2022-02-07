@@ -1,13 +1,10 @@
 call plug#begin('~/.config/nvim/plugged')
 
 " nvim lsp
-"Plug 'neovim/nvim-lspconfig'
-"Plug 'nvim-lua/completion-nvim'
-"Plug 'glepnir/lspsaga.nvim'
-"Plug 'onsails/lspkind-nvim'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/completion-nvim'
+Plug 'glepnir/lspsaga.nvim'
+Plug 'onsails/lspkind-nvim'
 
 " finder
 Plug 'nvim-lua/plenary.nvim'
@@ -28,9 +25,6 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-
-" file tree
-"Plug 'kyazdani42/nvim-tree.lua'
 
 " comment
 Plug 'tomtom/tcomment_vim'
