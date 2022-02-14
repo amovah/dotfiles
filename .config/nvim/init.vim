@@ -12,7 +12,7 @@ luafile ~/.config/nvim/theme-config.lua
 autocmd vimenter * ++nested colorscheme gruvbox
 
 " formatting go files after saving
-" autocmd BufWritePre *.go lua vim.lsp.buf.formatting()
+autocmd BufWritePre *.go lua vim.lsp.buf.formatting()
 " autocmd BufWritePre *.go lua goimports(1000)
 
 source ~/.config/nvim/basics.vim
