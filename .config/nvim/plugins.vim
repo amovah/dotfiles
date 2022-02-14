@@ -2,9 +2,10 @@ call plug#begin('~/.config/nvim/plugged')
 
 " nvim lsp
 Plug 'neovim/nvim-lspconfig'
-Plug 'nvim-lua/completion-nvim'
-Plug 'glepnir/lspsaga.nvim'
-Plug 'onsails/lspkind-nvim'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'saadparwaiz1/cmp_luasnip'
+Plug 'L3MON4D3/LuaSnip'
 
 " finder
 Plug 'nvim-lua/plenary.nvim'
