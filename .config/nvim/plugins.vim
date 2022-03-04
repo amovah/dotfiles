@@ -19,6 +19,9 @@ Plug 'akinsho/bufferline.nvim'
 
 " theme
 Plug 'morhetz/gruvbox'
+Plug 'joshdick/onedark.vim'
+
+" buffers
 Plug 'hoob3rt/lualine.nvim'
 Plug 'ryanoasis/vim-devicons'
 
@@ -35,5 +38,8 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 
 " Git
 Plug 'tpope/vim-fugitive'
+
+" tree sitter
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 call plug#end()
