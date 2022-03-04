@@ -40,3 +40,5 @@ luafile ~/.config/nvim/indent.lua
 
 " git
 luafile ~/.config/nvim/git.lua
+
+vnoremap <c-/> :TComment<cr>
