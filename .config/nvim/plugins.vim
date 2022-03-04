@@ -25,9 +25,12 @@ Plug 'akinsho/bufferline.nvim'
 " theme
 Plug 'morhetz/gruvbox'
 Plug 'joshdick/onedark.vim'
+Plug 'ray-x/aurora'
 
 " buffers
 Plug 'hoob3rt/lualine.nvim'
+
+" icon in file explorer
 Plug 'ryanoasis/vim-devicons'
 
 " nerdtree

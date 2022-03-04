@@ -6,6 +6,9 @@ filetype plugin indent on
 filetype plugin on
 syntax on
 
+" termguicolors
+set termguicolors
+
 set encoding=UTF-8
 
 set number                                                                      "Line numbers are good
