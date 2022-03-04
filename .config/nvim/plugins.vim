@@ -15,6 +15,7 @@ Plug 'tami5/lspsaga.nvim'
 " finder
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 " auto bracket closer
 Plug 'raimondi/delimitmate'
@@ -47,7 +48,8 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 
 " Git
 Plug 'tpope/vim-fugitive'
-Plug 'lewis6991/gitsigns.nvim'
+Plug 'lewis6991/gitsigns.nvim' " show changes in right of editor
+Plug 'kdheepak/lazygit.nvim'
 
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}

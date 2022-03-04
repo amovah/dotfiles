@@ -27,7 +27,8 @@ luafile ~/.config/nvim/lualine.lua
 source ~/.config/nvim/treesitter.lua
 
 " file finder
-source ~/.config/nvim/telescope.vim
+" source ~/.config/nvim/telescope.vim
+luafile ~/.config/nvim/telescope.lua
 
 " file explorer
 source ~/.config/nvim/nerdtree.vim
