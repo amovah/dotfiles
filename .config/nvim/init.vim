@@ -1,29 +1,45 @@
-" Basic Config
+" basic config
 source ~/.config/nvim/basics.vim
 
-" Parser
+" parser
 source ~/.config/nvim/plugins.vim
 
-" Language Server
+" neovim lsp - golang
 luafile ~/.config/nvim/go-lsp.lua
+
+" neovim lsp - plugins
 luafile ~/.config/nvim/lsp-keybindings.lua
 source ~/.config/nvim/autocompletion-config.vim
 luafile ~/.config/nvim/cmp-nvim-lsp.lua
 
-autocmd BufWritePre *.go lua goimports(1000)
+" auto format files
+source ~/.config/nvim/auto-format-files.vim
 
-" Theme
+" lsp saga
+luafile ~/.config/nvim/lsp-saga.lua
+
+" theme
 luafile ~/.config/nvim/theme-config.lua
 
-" formatting go files after saving
-autocmd BufWritePre *.go lua vim.lsp.buf.formatting()
-
+" treesitter - better grammer syntax highlighter
 source ~/.config/nvim/treesitter.lua
 
+" file finder
 source ~/.config/nvim/telescope.vim
+
+" file explorer
 source ~/.config/nvim/nerdtree.vim
+
+" buffers
 source ~/.config/nvim/buffers.vim
+
+" buffer line - bottom bar
 luafile ~/.config/nvim/bufferline.lua
+
+" indent guidance
 luafile ~/.config/nvim/indent.lua
+
+" git
+luafile ~/.config/nvim/git.lua
 
 vnoremap <c-/> :TComment<cr>

@@ -2,10 +2,15 @@ call plug#begin('~/.config/nvim/plugged')
 
 " nvim lsp
 Plug 'neovim/nvim-lspconfig'
+
+" lsp auto complete
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'L3MON4D3/LuaSnip'
+
+" lsp saga
+Plug 'tami5/lspsaga.nvim'
 
 " finder
 Plug 'nvim-lua/plenary.nvim'
@@ -38,6 +43,7 @@ Plug 'lukas-reineke/indent-blankline.nvim'
 
 " Git
 Plug 'tpope/vim-fugitive'
+Plug 'lewis6991/gitsigns.nvim'
 
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
