@@ -8,7 +8,7 @@ source ~/.config/nvim/plugins.vim
 luafile ~/.config/nvim/go-lsp.lua
 luafile ~/.config/nvim/lsp-keybindings.lua
 source ~/.config/nvim/autocompletion-config.vim
-source ~/.config/nvim/cmp-nvim-lsp.lua
+luafile ~/.config/nvim/cmp-nvim-lsp.lua
 
 autocmd BufWritePre *.go lua goimports(1000)
 
