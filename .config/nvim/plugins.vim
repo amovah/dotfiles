@@ -26,6 +26,7 @@ Plug 'akinsho/bufferline.nvim'
 Plug 'morhetz/gruvbox'
 Plug 'joshdick/onedark.vim'
 Plug 'ray-x/aurora'
+Plug 'mhartington/oceanic-next'
 
 " buffers
 Plug 'hoob3rt/lualine.nvim'

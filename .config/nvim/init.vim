@@ -20,6 +20,9 @@ luafile ~/.config/nvim/lsp-saga.lua
 " theme
 luafile ~/.config/nvim/theme-config.lua
 
+" lua line - status line
+luafile ~/.config/nvim/lualine.lua
+
 " treesitter - better grammer syntax highlighter
 source ~/.config/nvim/treesitter.lua
 
@@ -29,10 +32,10 @@ source ~/.config/nvim/telescope.vim
 " file explorer
 source ~/.config/nvim/nerdtree.vim
 
-" buffers
+" buffers (hotkeys)
 source ~/.config/nvim/buffers.vim
 
-" buffer line - bottom bar
+" buffer (tab manager)
 luafile ~/.config/nvim/bufferline.lua
 
 " indent guidance
