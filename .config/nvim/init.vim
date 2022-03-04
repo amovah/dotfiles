@@ -10,7 +10,7 @@ luafile ~/.config/nvim/go-lsp.lua
 " neovim lsp - plugins
 luafile ~/.config/nvim/lsp-keybindings.lua
 source ~/.config/nvim/autocompletion-config.vim
-luafile ~/.config/nvim/cmp-nvim-lsp.lua
+" luafile ~/.config/nvim/cmp-nvim-lsp.lua
 
 " auto format files
 source ~/.config/nvim/auto-format-files.vim
