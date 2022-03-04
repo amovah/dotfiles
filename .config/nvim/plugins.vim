@@ -40,7 +40,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 " comment
-Plug 'tomtom/tcomment_vim'
+Plug 'numToStr/Comment.nvim'
 
 " indent
 Plug 'lukas-reineke/indent-blankline.nvim'
