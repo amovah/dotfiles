@@ -2,7 +2,7 @@ lspconfig = require "lspconfig"
 lspconfig.gopls.setup {
     cmd = {"gopls", "serve"},
     filetypes = {"go", "gomod"},
-    root_dir = util.root_pattern("go.work", "go.mod", ".git")
+    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
     settings = {
         gopls = {
             analyses = {
