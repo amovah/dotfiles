@@ -32,13 +32,9 @@ Plug 'mhartington/oceanic-next'
 " buffers
 Plug 'hoob3rt/lualine.nvim'
 
-" icon in file explorer
-Plug 'ryanoasis/vim-devicons'
-
-" nerdtree
-Plug 'preservim/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+" file explorer
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
+Plug 'kyazdani42/nvim-tree.lua'
 
 " comment
 Plug 'numToStr/Comment.nvim'

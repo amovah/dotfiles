@@ -31,7 +31,7 @@ source ~/.config/nvim/treesitter.lua
 luafile ~/.config/nvim/telescope.lua
 
 " file explorer
-source ~/.config/nvim/nerdtree.vim
+luafile ~/.config/nvim/nvim-tree.lua
 
 " buffers (hotkeys)
 source ~/.config/nvim/buffers.vim
