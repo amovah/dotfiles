@@ -60,4 +60,7 @@ Plug 'kdheepak/lazygit.nvim'
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
+" Symbol outline - tree of symbols on the right hand of your neovim
+Plug 'simrat39/symbols-outline.nvim'
+
 call plug#end()

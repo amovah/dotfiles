@@ -46,5 +46,8 @@ luafile ~/.config/nvim/indent.lua
 luafile ~/.config/nvim/git.lua
 source ~/.config/nvim/lazygit.vim
 
-" Commnet
+" commnet
 luafile ~/.config/nvim/comment.lua
+
+" symbol outlines
+luafile ~/.config/nvim/symbol-outline.lua
