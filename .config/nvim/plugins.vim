@@ -58,7 +58,7 @@ Plug 'lewis6991/gitsigns.nvim' " show changes in right of editor
 Plug 'kdheepak/lazygit.nvim'
 
 " tree sitter
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter' " run :TSUpdate later to update treesitter, for unknown reason it stuck when installing plugin
 
 " symbol outline - tree of symbols on the right hand of your neovim
 Plug 'simrat39/symbols-outline.nvim'
