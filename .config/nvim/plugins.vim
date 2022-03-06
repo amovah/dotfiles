@@ -12,6 +12,9 @@ Plug 'L3MON4D3/LuaSnip'
 " add icon for autocomplete menu
 Plug 'onsails/lspkind-nvim'
 
+" lsp signature help on type
+Plug 'ray-x/lsp_signature.nvim'
+
 " lsp saga
 Plug 'tami5/lspsaga.nvim'
 
