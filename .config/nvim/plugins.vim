@@ -70,4 +70,7 @@ Plug 'hrsh7th/cmp-cmdline'
 " which key
 Plug 'folke/which-key.nvim'
 
+" trouble - diagnostic list
+Plug 'folke/trouble.nvim'
+
 call plug#end()

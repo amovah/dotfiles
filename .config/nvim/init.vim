@@ -9,7 +9,7 @@ luafile ~/.config/nvim/go-lsp.lua
 
 " neovim lsp - plugins
 luafile ~/.config/nvim/lsp-keybindings.lua
-source ~/.config/nvim/autocompletion-config.vim
+source ~/.config/nvim/auto-completion.vim
 
 " auto format files
 source ~/.config/nvim/auto-format-files.vim
@@ -54,3 +54,6 @@ luafile ~/.config/nvim/symbol-outline.lua
 
 " which key
 luafile ~/.config/nvim/which-key.lua
+
+" trouble
+luafile ~/.config/nvim/trouble.lua
