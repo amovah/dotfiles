@@ -18,4 +18,3 @@ vim.api.nvim_command('colorscheme nightfox')
 -- vim.api.nvim_command('colorscheme tokyonight')
 --
 -- vim.api.nvim_command('colorscheme nord')
-

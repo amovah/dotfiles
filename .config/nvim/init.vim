@@ -51,3 +51,6 @@ luafile ~/.config/nvim/comment.lua
 
 " symbol outlines
 luafile ~/.config/nvim/symbol-outline.lua
+
+" which key
+luafile ~/.config/nvim/which-key.lua

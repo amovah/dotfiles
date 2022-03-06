@@ -67,4 +67,7 @@ Plug 'simrat39/symbols-outline.nvim'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 
+" which key
+Plug 'folke/which-key.nvim'
+
 call plug#end()
