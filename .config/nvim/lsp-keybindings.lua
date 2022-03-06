@@ -34,7 +34,7 @@ local on_attach = function(client, bufnr)
     map(bufnr, "n", "<space>rn", "<cmd>Lspsaga rename<cr>", opts)
     map(bufnr, "n", "gx", "<cmd>Lspsaga code_action<cr>", opts)
     map(bufnr, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", opts)
-    map(bufnr, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", opts)
+    map(bufnr, "n", "K", "<cmd>Lspsaga hover_doc<cr>", opts)
     map(bufnr, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", opts)
     map(bufnr, "n", "gj", "<cmd>Lspsaga diagnostic_jump_next<cr>", opts)
     map(bufnr, "n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<cr>", opts)
@@ -54,7 +54,6 @@ end
 --         }
 --     }
 -- end
-
 
 -- Add additional capabilities supported by nvim-cmp
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -79,7 +78,20 @@ local luasnip = require 'luasnip'
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
+local lspkind = require('lspkind')
 cmp.setup {
+    formatting = {
+        format = lspkind.cmp_format({
+            mode = 'symbol_text', -- show only symbol annotations
+            maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+
+            -- The function below will be called before any actual modifications from lspkind
+            -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
+            before = function(entry, vim_item)
+                return vim_item
+            end
+        })
+    },
     snippet = {
         expand = function(args)
             require('luasnip').lsp_expand(args.body)
