@@ -15,7 +15,7 @@ nnoremap <silent><Leader>Q :bd<CR>
 " Close all other buffers except current one
 nnoremap <Leader>db :silent w <BAR> :silent %bd <BAR> e#<CR>
 
-nnoremap gx :call netrw#BrowseX(expand('<cfile>'), netrw#CheckIfRemote())<CR>
+" nnoremap gx :call netrw#BrowseX(expand('<cfile>'), netrw#CheckIfRemote())<CR>
 
 " Indenting in visual mode
 xnoremap <s-tab> <gv

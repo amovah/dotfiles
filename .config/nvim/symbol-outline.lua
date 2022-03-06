@@ -6,7 +6,7 @@ vim.g.symbols_outline = {
     relative_width = true,
     width = 25,
     auto_close = false,
-    show_numbers = false,
+    show_numbers = true,
     show_relative_numbers = false,
     show_symbol_details = true,
     preview_bg_highlight = 'Pmenu',
@@ -129,4 +129,4 @@ vim.g.symbols_outline = {
     }
 }
 
-vim.api.nvim_command('nnoremap <leader>o :SymbolsOutlineOpen<CR>')
+vim.api.nvim_command('nnoremap <leader>o :SymbolsOutline<CR>')
