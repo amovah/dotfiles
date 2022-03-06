@@ -57,3 +57,6 @@ luafile ~/.config/nvim/which-key.lua
 
 " trouble
 luafile ~/.config/nvim/trouble.lua
+
+" glow
+source ~/.config/nvim/glow.vim

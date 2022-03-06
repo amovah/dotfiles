@@ -73,4 +73,7 @@ Plug 'folke/which-key.nvim'
 " trouble - diagnostic list
 Plug 'folke/trouble.nvim'
 
+" markdown preview
+Plug 'ellisonleao/glow.nvim'
+
 call plug#end()
