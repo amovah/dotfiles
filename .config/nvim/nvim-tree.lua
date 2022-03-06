@@ -81,4 +81,4 @@ require'nvim-tree'.setup {
     }
 }
 
-vim.api.nvim_command('nnoremap <silent>- :NvimTreeToggle<CR>')
+vim.api.nvim_command('nnoremap <C-n> :NvimTreeToggle<CR>')

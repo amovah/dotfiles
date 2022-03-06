@@ -44,6 +44,7 @@ luafile ~/.config/nvim/indent.lua
 
 " git
 luafile ~/.config/nvim/git.lua
+source ~/.config/nvim/lazygit.vim
 
 " Commnet
 luafile ~/.config/nvim/comment.lua
