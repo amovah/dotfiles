@@ -24,7 +24,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 " auto bracket closer
-Plug 'raimondi/delimitmate'
+Plug 'windwp/nvim-autopairs'
 
 " show buffers
 Plug 'akinsho/bufferline.nvim'

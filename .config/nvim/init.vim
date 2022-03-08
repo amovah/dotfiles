@@ -60,3 +60,6 @@ luafile ~/.config/nvim/trouble.lua
 
 " glow
 source ~/.config/nvim/glow.vim
+
+" autopairs
+luafile ~/.config/nvim/autopairs.lua
