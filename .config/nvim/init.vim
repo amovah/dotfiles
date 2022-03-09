@@ -4,13 +4,13 @@ source ~/.config/nvim/basics.vim
 " parser
 source ~/.config/nvim/plugins.vim
 
-" neovim lsp - golang
-luafile ~/.config/nvim/lsp/go.lua
-luafile ~/.config/nvim/lsp/rust.lua
+" neovim lsp
+luafile ~/.config/nvim/lsp/configs.lua
+luafile ~/.config/nvim/lsp/cmp.lua
+source ~/.config/nvim/lsp/auto-completion.vim
 
-" neovim lsp - plugins
-luafile ~/.config/nvim/lsp-keybindings.lua
-source ~/.config/nvim/auto-completion.vim
+" neovim lsp - go
+source ~/.config/nvim/lsp/go-imports.lua
 
 " auto format files
 source ~/.config/nvim/auto-format-files.vim
