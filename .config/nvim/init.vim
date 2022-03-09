@@ -5,7 +5,8 @@ source ~/.config/nvim/basics.vim
 source ~/.config/nvim/plugins.vim
 
 " neovim lsp - golang
-luafile ~/.config/nvim/go-lsp.lua
+luafile ~/.config/nvim/lsp/go.lua
+luafile ~/.config/nvim/lsp/rust.lua
 
 " neovim lsp - plugins
 luafile ~/.config/nvim/lsp-keybindings.lua
