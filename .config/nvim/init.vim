@@ -64,3 +64,6 @@ source ~/.config/nvim/glow.vim
 
 " autopairs
 luafile ~/.config/nvim/autopairs.lua
+
+" protobuf
+source ~/.config/nvim/proto.vim
