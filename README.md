@@ -51,6 +51,7 @@ window-height = 60
 - [lazygit](https://github.com/jesseduffield/lazygit)
 - [fzf](https://junegunn.github.io/fzf/)
 - [ripgrep](https://github.com/BurntSushi/ripgrep)
+- [eza](https://github.com/eza-community/eza)
 
 ## GNOME Extensions
 
