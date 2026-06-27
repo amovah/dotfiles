@@ -52,6 +52,7 @@ window-height = 60
 - [fzf](https://junegunn.github.io/fzf/)
 - [ripgrep](https://github.com/BurntSushi/ripgrep)
 - [eza](https://github.com/eza-community/eza)
+- [bat](https://github.com/sharkdp/bat)
 
 ## GNOME Extensions
 
