@@ -23,6 +23,10 @@ My personal setup on Ubuntu.
   - [claude-notifications-go](https://github.com/777genius/claude-notifications-go)
   - [cc-skills-golang](https://github.com/samber/cc-skills-golang)
 
+### Notable Skills And Tools
+  - [ui-ux-pro-max](https://www.skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max)
+  - [graphifyy](https://graphify.net)
+
 ## Editor
 
 - Mainly: nvim + [LazyVim](https://www.lazyvim.org)
