@@ -16,6 +16,7 @@ My personal setup on Ubuntu.
   - frontend-design
   - gopls-lsp
   - typescript-lsp
+  - superpower
 - Unofficial plugins:
   - [caveman](https://getcaveman.dev/)
   - [claude-mem](https://github.com/thedotmack/claude-mem)
