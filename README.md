@@ -27,6 +27,7 @@ My personal setup on Ubuntu.
   - [ui-ux-pro-max](https://www.skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max)
   - [graphifyy](https://graphify.net)
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline)
+  - [rtk](https://github.com/rtk-ai/rtk)
 
 ## Editor
 
