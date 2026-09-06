@@ -1,0 +1,7 @@
+shell-integration = zsh
+macos-option-as-alt = true
+
+# Let Option+arrows reach zellij as Alt+arrow (CSI 1;3C/D) instead of esc:f/esc:b,
+# which zellij interpreted as "Alt f" -> ToggleFloatingPanes.
+keybind = alt+arrow_left=unbind
+keybind = alt+arrow_right=unbind
