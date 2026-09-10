@@ -81,6 +81,7 @@ Tracked configs:
 | `zellij` | `home/.config/zellij/config.kdl` | `~/.config/zellij/config.kdl` |
 | `zellij` | `home/.config/zellij/layouts/dev.kdl` | `~/.config/zellij/layouts/dev.kdl` |
 | `ghostty` | `home/.config/ghostty/config` | `~/.config/ghostty/config` |
+| `fish` | `home/.config/fish/conf.d/sdkroot.fish` | `~/.config/fish/conf.d/sdkroot.fish` |
 | `markdownlint` | `home/.markdownlint-cli2.yaml` | `~/.markdownlint-cli2.yaml` |
 
 App names come from the file path. `~/.config/<app>/...` names itself; anything
@@ -99,6 +100,33 @@ untracked.
 - nvm: [nvm.fish](https://github.com/jorgebucaran/nvm.fish)
 - theme: [tide](https://github.com/IlanCosman/tide)
 - font: [UbuntuMono Nerd Font](https://www.nerdfonts.com/) — `./install.sh fonts`
+
+Only drop-ins this repo owns are tracked — `config.fish` and the fisher-managed
+files in `conf.d/` (`_tide_init.fish`, `nvm.fish`) stay untracked. fish sources
+everything in `conf.d/` automatically, so a snippet needs no wiring in
+`config.fish`.
+
+`conf.d/sdkroot.fish` pins `SDKROOT` to the Command Line Tools `MacOSX.sdk`
+symlink on macOS, and does nothing elsewhere. clang otherwise picks the
+*highest-numbered* SDK it finds rather than the one that symlink points at, so
+a leftover SDK from a beta CLT wins over the one matching the installed
+toolchain and every native build fails at the link step:
+
+```
+ld: tapi error: malformed file
+.../MacOSX27.0.sdk/usr/lib/libSystem.B.tbd: unknown architecture
+                   arm64e.x1-macos, arm64e.x1-maccatalyst ]
+```
+
+That hits tree-sitter parsers (`:TSInstall` reports only "Failed to compile
+parser"), node native modules, cgo and Rust `cc-rs` alike. Targeting the
+symlink rather than a pinned version keeps working across CLT upgrades. It only
+reaches programs started from fish, though — deleting the stray SDK is the
+complete fix:
+
+```
+sudo rm -rf /Library/Developer/CommandLineTools/SDKs/MacOSX<n>.sdk
+```
 
 ## AI
 
