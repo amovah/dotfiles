@@ -135,12 +135,11 @@ sudo rm -rf /Library/Developer/CommandLineTools/SDKs/MacOSX<n>.sdk
   - frontend-design
   - gopls-lsp
   - typescript-lsp
-  - superpowers
 - Unofficial plugins:
-  - [caveman](https://getcaveman.dev/)
-  - [claude-mem](https://github.com/thedotmack/claude-mem)
   - [claude-notifications-go](https://github.com/777genius/claude-notifications-go)
   - [cc-skills-golang](https://github.com/samber/cc-skills-golang)
+  - [mattpocock/skills](https://github.com/mattpocock/skills)
+  - [ponytail](https://github.com/dietrichgebert/ponytail)
 
 ### Notable Skills And Tools
   - [ui-ux-pro-max](https://www.skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max)
