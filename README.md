@@ -7,29 +7,69 @@ commands below list both.
 
 Everything under `home/` mirrors `$HOME`. `install.sh` symlinks each file to its
 matching path, backing up any existing real file as `<file>.backup`. Files are
-grouped by the app they configure, and you install whole apps:
+grouped by the app they configure, and each app is one menu item. Things that
+are not config files — `fonts`, so far — are menu items too:
 
 ```
-./install.sh                  # pick apps from a menu
-./install.sh zellij nvim      # install named apps
-./install.sh --all            # every app, no prompt
+./install.sh                  # pick items from a menu
+./install.sh zellij fonts     # install named items
+./install.sh --all            # every item, no prompt
 ./install.sh --dry-run        # preview, changes nothing (combines with the above)
 ```
 
 The menu uses [fzf](https://junegunn.github.io/fzf/) when it is installed
 (`up`/`down` to move, `tab` to toggle, `ctrl-a` for all, `ctrl-d` for none,
 `enter` to confirm, `esc` to cancel), and falls back to a numbered prompt
-otherwise (`1 3-5`, `a` for all, `q` to quit). Either way each row shows how
-many of that app's files are already linked:
+otherwise (`1 3-5`, `a` for all, `q` to quit). Either way each row shows what
+is already in place — how many of an app's files are linked, or whether the
+font is installed:
 
 ```
-  1) nvim         [      ] 3 files
-  2) zellij       [      ] 2 files
-  3) markdownlint [linked] 1 file
+  1) ghostty      [linked] 1 file
+  2) nvim         [      ] 3 files
+  3) zellij       [ 1/2  ] 2 files
+  4) markdownlint [      ] 1 file
+  5) fonts        [  ok  ] UbuntuMono Nerd Font
 ```
 
 With no terminal attached it installs everything, so it stays usable from
 another script.
+
+Non-config items live in the `extras` array, with a case each in `label()` and
+`install_item()`. `fonts` fetches the font ghostty is configured for from the
+[Nerd Fonts releases](https://github.com/ryanoasis/nerd-fonts/releases),
+unpacking into `~/Library/Fonts` on macOS and `~/.local/share/fonts` (plus
+`fc-cache`) elsewhere. It skips a font that is already installed and honours
+`--dry-run`. The font name is the `nerd_font` variable; the release tag is
+pinned next to it and `NERD_FONT_VERSION` overrides it.
+
+Picking `ghostty` alone installs only its config — the font is a separate
+choice, so select `fonts` too (or `--all`).
+
+### Uninstall
+
+`uninstall.sh` reverses all of it, with the same menu and the same flags:
+
+```
+./uninstall.sh                # pick items from a menu
+./uninstall.sh zellij fonts   # uninstall named items
+./uninstall.sh --all          # every item, no prompt
+./uninstall.sh --dry-run      # preview, changes nothing
+```
+
+Tracked configs are unlinked, any `<file>.backup` is moved back into place, and
+directories left empty are cleared (`rmdir` only touches an empty one, so a
+directory still holding anything of yours survives). `fonts` deletes the font
+files it installed and nothing else in the font directory.
+
+Anything this repo did not create is left where it is, reported as `skip`: a
+real file at a tracked path, or a symlink pointing somewhere other than into
+this repo. The one gap is on the install side — `install.sh` only backs up
+*real* files, so a symlink you had pointing elsewhere is replaced silently and
+uninstall has nothing to restore.
+
+The work lives in `install.sh` behind `--uninstall`, which `uninstall.sh`
+execs, so the two directions share one item list and one menu.
 
 Tracked configs:
 
@@ -58,7 +98,7 @@ untracked.
 - plugin manager: [fisher](https://github.com/jorgebucaran/fisher)
 - nvm: [nvm.fish](https://github.com/jorgebucaran/nvm.fish)
 - theme: [tide](https://github.com/IlanCosman/tide)
-- font: [Ubuntu Nerd Font](https://www.nerdfonts.com/)
+- font: [UbuntuMono Nerd Font](https://www.nerdfonts.com/) — `./install.sh fonts`
 
 ## AI
 
@@ -95,6 +135,16 @@ Colorscheme is gruvbox (hard contrast); nvim-lint points markdownlint-cli2 at
 Config lives at `home/.config/ghostty/config`. Note the filename: Ghostty only
 reads `config`, with no extension — a `config.ghostty` sitting next to it is
 silently ignored.
+
+`command` is what actually picks the shell — `shell-integration = fish` only
+selects which integration script gets injected, so on its own it leaves Ghostty
+starting the login shell from `/etc/passwd` (zsh here). `--login` keeps fish's
+login-only setup running.
+
+`font-family = UbuntuMono Nerd Font` is the monospace Ubuntu face from the Nerd
+Fonts `UbuntuMono` release — the plain `Ubuntu` release is proportional and
+misaligns in a terminal. `font-size = 15` is two steps up from Ghostty's
+default 13.
 
 `macos-option-as-alt = true` makes Option behave as Alt. On top of that,
 Ghostty's default `alt+arrow_left`/`alt+arrow_right` binds send `esc:b`/`esc:f`,

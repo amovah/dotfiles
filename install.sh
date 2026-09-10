@@ -3,12 +3,18 @@
 #
 #   home/.config/zellij/config.kdl  ->  ~/.config/zellij/config.kdl
 #
-# Files are grouped by the app they configure (zellij, nvim, claude-code, ...).
-# Run with no arguments to pick apps from a menu, name apps as arguments to
+# Files are grouped by the app they configure (zellij, nvim, claude-code, ...),
+# and each app is one item in the install menu. Items that are not config files
+# -- fonts, so far -- sit in `extras` alongside them.
+#
+# Run with no arguments to pick items from a menu, name items as arguments to
 # install just those, or use --all to install everything without prompting.
 #
 # Existing real files are moved aside to <file>.backup before linking.
-# Re-running is safe: correct links are left alone.
+# Re-running is safe: correct links and installed fonts are left alone.
+#
+# --uninstall reverses all of that, and is what uninstall.sh calls. Both
+# directions share this file so the menu and the item list cannot drift apart.
 
 set -euo pipefail
 
@@ -17,14 +23,21 @@ src_root="$repo_root/home"
 
 dry_run=false
 select_all=false
+uninstall=false
 requested=()
 
 usage() {
-  cat <<'USAGE'
-usage: install.sh [--all] [--dry-run] [app ...]
+  local prog=install.sh verb=install
+  if $uninstall; then
+    prog=uninstall.sh
+    verb=uninstall
+  fi
 
-  app        one or more app names to install (see the list below)
-  --all      install every app, no prompt
+  cat <<USAGE
+usage: $prog [--all] [--dry-run] [item ...]
+
+  item       one or more items to $verb (see the menu for the full list)
+  --all      $verb every item, no prompt
   --dry-run  print what would happen, change nothing
   -h         show this help
 USAGE
@@ -34,6 +47,7 @@ for arg in "$@"; do
   case "$arg" in
     --all) select_all=true ;;
     --dry-run) dry_run=true ;;
+    --uninstall) uninstall=true ;;
     -h | --help)
       usage
       exit 0
@@ -86,10 +100,16 @@ for app in "${file_apps[@]}"; do
   $known || apps+=("$app")
 done
 
-# Widest app name, so the menu columns line up.
-app_width=0
-for app in "${apps[@]}"; do
-  [[ ${#app} -gt $app_width ]] && app_width=${#app}
+# Menu items that are not symlinked config files. Each needs a case in
+# label() and install_item().
+extras=(fonts)
+
+items=("${apps[@]}" "${extras[@]}")
+
+# Widest item name, so the menu columns line up.
+item_width=0
+for item in "${items[@]}"; do
+  [[ ${#item} -gt $item_width ]] && item_width=${#item}
 done
 
 files_of() {
@@ -99,13 +119,36 @@ files_of() {
   done
 }
 
+# The Nerd Font the ghostty config asks for.
+nerd_font=UbuntuMono
+
+font_dir() {
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    echo "$HOME/Library/Fonts"
+  else
+    echo "${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+  fi
+}
+
+font_installed() {
+  compgen -G "$(font_dir)/${nerd_font}NerdFont*.ttf" >/dev/null
+}
+
 is_linked() {
   local dest="$HOME/$1"
   [[ -L "$dest" && "$(readlink -f "$dest")" == "$(readlink -f "$src_root/$1")" ]]
 }
 
-# "zellij  [linked] 2 files" / "nvim  [ 1/3 ] 3 files" / "nvim  [      ] 3 files"
+# One menu row. Every state marker is 8 columns wide so the rows line up.
 label() {
+  case "$1" in
+    fonts) label_fonts ;;
+    *) label_app "$1" ;;
+  esac
+}
+
+# "zellij  [linked] 2 files" / "nvim  [ 1/3 ] 3 files" / "nvim  [      ] 3 files"
+label_app() {
   local app="$1" total=0 linked=0 file state
   while IFS= read -r file; do
     total=$((total + 1))
@@ -120,9 +163,16 @@ label() {
     state="[ $linked/$total  ]"
   fi
 
-  printf "%-${app_width}s %s %d file" "$app" "$state" "$total"
+  printf "%-${item_width}s %s %d file" "$app" "$state" "$total"
   [[ "$total" -ne 1 ]] && printf 's'
   printf '\n'
+}
+
+# "fonts   [  ok  ] UbuntuMono Nerd Font"
+label_fonts() {
+  local state="[      ]"
+  font_installed && state="[  ok  ]"
+  printf "%-${item_width}s %s %s Nerd Font\n" fonts "$state" "$nerd_font"
 }
 
 link() {
@@ -151,23 +201,179 @@ link() {
   echo "  link    $dest"
 }
 
-install_app() {
-  local app="$1" file
-  echo "$app"
-  while IFS= read -r file; do
-    link "$file"
-  done < <(files_of "$app")
+# Download a font from the ryanoasis/nerd-fonts releases into the user font
+# directory. The argument is a release asset name without the .zip; see
+# https://github.com/ryanoasis/nerd-fonts/releases for the full list.
+install_nerd_font() {
+  local font="$1"
+  local version="${NERD_FONT_VERSION:-v3.5.1}"
+  local url work ttf count=0
+  local dir
+  dir="$(font_dir)"
+
+  if font_installed; then
+    echo "  ok      $font Nerd Font already in $dir"
+    return
+  fi
+
+  url="https://github.com/ryanoasis/nerd-fonts/releases/download/$version/$font.zip"
+
+  if $dry_run; then
+    echo "  would install $font Nerd Font $version -> $dir"
+    return
+  fi
+
+  work="$(mktemp -d)"
+
+  echo "  fetch   $url"
+  if ! curl -fsSL --retry 3 -o "$work/$font.zip" "$url"; then
+    rm -rf "$work"
+    echo "download failed: $url" >&2
+    echo "check the asset name against $version's release page" >&2
+    return 1
+  fi
+
+  unzip -oq "$work/$font.zip" -d "$work/font"
+
+  mkdir -p "$dir"
+  while IFS= read -r -d '' ttf; do
+    cp "$ttf" "$dir/"
+    count=$((count + 1))
+  done < <(find "$work/font" -name '*.ttf' -print0)
+
+  rm -rf "$work"
+
+  if [[ "$count" -eq 0 ]]; then
+    echo "no .ttf files in $font.zip" >&2
+    return 1
+  fi
+
+  echo "  font    $count files -> $dir"
+
+  # macOS picks new fonts up on its own; fontconfig needs a nudge.
+  command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$dir" >/dev/null
+
+  return 0
+}
+
+# Remove a symlink this repo owns, putting back whatever it displaced. Anything
+# we did not create -- a real file, or a link pointing somewhere else -- is left
+# where it is.
+unlink_file() {
+  local name="$1"
+  local src="$src_root/$name"
+  local dest="$HOME/$name"
+
+  if [[ ! -e "$dest" && ! -L "$dest" ]]; then
+    echo "  gone    $dest"
+    return
+  fi
+
+  if [[ ! -L "$dest" ]]; then
+    echo "  skip    $dest (real file, not ours)"
+    return
+  fi
+
+  if [[ "$(readlink -f "$dest")" != "$(readlink -f "$src")" ]]; then
+    echo "  skip    $dest (links elsewhere)"
+    return
+  fi
+
+  if $dry_run; then
+    echo "  would unlink $dest"
+    [[ -e "$dest.backup" ]] && echo "  would restore $dest.backup -> $dest"
+    return 0
+  fi
+
+  rm -f "$dest"
+  echo "  unlink  $dest"
+
+  if [[ -e "$dest.backup" ]]; then
+    mv "$dest.backup" "$dest"
+    echo "  restore $dest.backup -> $dest"
+    return
+  fi
+
+  prune_dirs "$(dirname "$dest")"
+
+  return 0
+}
+
+# Walk up from a directory an unlink emptied, clearing what is left. rmdir only
+# succeeds on an empty directory, so a dir still holding anything stops this.
+# $HOME itself is never a candidate.
+prune_dirs() {
+  local dir="$1"
+  while [[ "$dir" != "$HOME" && "$dir" != "/" ]]; do
+    rmdir "$dir" 2>/dev/null || break
+    echo "  rmdir   $dir"
+    dir="$(dirname "$dir")"
+  done
+}
+
+# Delete the font files install_nerd_font laid down, and nothing else in there.
+remove_nerd_font() {
+  local font="$1" ttf count=0
+  local dir
+  dir="$(font_dir)"
+
+  if ! font_installed; then
+    echo "  gone    $font Nerd Font not in $dir"
+    return
+  fi
+
+  if $dry_run; then
+    echo "  would remove $font Nerd Font from $dir"
+    return
+  fi
+
+  while IFS= read -r -d '' ttf; do
+    rm -f "$ttf"
+    count=$((count + 1))
+  done < <(find "$dir" -maxdepth 1 -name "${font}NerdFont*.ttf" -print0)
+
+  echo "  remove  $count files from $dir"
+
+  command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$dir" >/dev/null
+
+  return 0
+}
+
+install_item() {
+  local item="$1" file
+  echo "$item"
+  case "$item" in
+    fonts) install_nerd_font "$nerd_font" ;;
+    *)
+      while IFS= read -r file; do
+        link "$file"
+      done < <(files_of "$item")
+      ;;
+  esac
+}
+
+uninstall_item() {
+  local item="$1" file
+  echo "$item"
+  case "$item" in
+    fonts) remove_nerd_font "$nerd_font" ;;
+    *)
+      while IFS= read -r file; do
+        unlink_file "$file"
+      done < <(files_of "$item")
+      ;;
+  esac
 }
 
 pick_with_fzf() {
-  local app
-  for app in "${apps[@]}"; do
-    label "$app"
+  local item
+  for item in "${items[@]}"; do
+    label "$item"
   done |
     fzf --multi \
       --layout=reverse \
       --height=60% \
-      --prompt='install> ' \
+      --prompt="$($uninstall && echo uninstall || echo install)> " \
       --header=$'up/down: move   tab: toggle   ctrl-a: all   ctrl-d: none   enter: confirm   esc: cancel\n' \
       --bind='ctrl-a:select-all,ctrl-d:deselect-all' |
     awk '{print $1}'
@@ -179,8 +385,8 @@ pick_with_fzf() {
 pick_with_prompt() {
   local i reply token start end
 
-  for ((i = 0; i < ${#apps[@]}; i++)); do
-    printf '  %2d) %s\n' "$((i + 1))" "$(label "${apps[$i]}")"
+  for ((i = 0; i < ${#items[@]}; i++)); do
+    printf '  %2d) %s\n' "$((i + 1))" "$(label "${items[$i]}")"
   done
 
   printf '\nselect (e.g. "1 3-5", "a" for all, "q" to quit): '
@@ -190,7 +396,7 @@ pick_with_prompt() {
   case "$reply" in
     q | Q | "") return 0 ;;
     a | A | all)
-      selected=("${apps[@]}")
+      selected=("${items[@]}")
       return 0
       ;;
   esac
@@ -208,11 +414,11 @@ pick_with_prompt() {
     fi
 
     for ((i = start; i <= end; i++)); do
-      if [[ "$i" -lt 1 || "$i" -gt ${#apps[@]} ]]; then
+      if [[ "$i" -lt 1 || "$i" -gt ${#items[@]} ]]; then
         echo "out of range: $i" >&2
         continue
       fi
-      selected+=("${apps[$((i - 1))]}")
+      selected+=("${items[$((i - 1))]}")
     done
   done
 }
@@ -222,22 +428,22 @@ selected=()
 if [[ ${#requested[@]} -gt 0 ]]; then
   for want in "${requested[@]}"; do
     found=false
-    for app in "${apps[@]}"; do
-      [[ "$app" == "$want" ]] && found=true && break
+    for item in "${items[@]}"; do
+      [[ "$item" == "$want" ]] && found=true && break
     done
     if $found; then
       selected+=("$want")
     else
-      echo "unknown app: $want" >&2
-      echo "known apps: ${apps[*]}" >&2
+      echo "unknown item: $want" >&2
+      echo "known items: ${items[*]}" >&2
       exit 2
     fi
   done
 elif $select_all || [[ ! -t 0 && ! -t 1 ]]; then
-  selected=("${apps[@]}")
+  selected=("${items[@]}")
 elif command -v fzf >/dev/null 2>&1; then
-  while IFS= read -r app; do
-    selected+=("$app")
+  while IFS= read -r item; do
+    selected+=("$item")
   done < <(pick_with_fzf)
 else
   pick_with_prompt
@@ -248,6 +454,10 @@ if [[ ${#selected[@]} -eq 0 ]]; then
   exit 0
 fi
 
-for app in "${selected[@]}"; do
-  install_app "$app"
+for item in "${selected[@]}"; do
+  if $uninstall; then
+    uninstall_item "$item"
+  else
+    install_item "$item"
+  fi
 done
