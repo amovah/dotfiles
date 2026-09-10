@@ -253,6 +253,12 @@ keybinds clear-defaults=true {
     }
 }
 
+// Open panes in fish. Without this zellij uses $SHELL, which stays zsh: the
+// login shell in /etc/passwd is zsh, and ghostty launching fish via `command`
+// does not rewrite $SHELL (default: $SHELL). Bare name, not a path -- fish is
+// at /opt/homebrew/bin on macOS and /usr/bin on Ubuntu.
+default_shell "fish"
+
 // Start locked, so keys reach nvim and the shell untouched (default: normal).
 default_mode "locked"
 
