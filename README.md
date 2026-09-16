@@ -8,7 +8,7 @@ commands below list both.
 Everything under `home/` mirrors `$HOME`. `install.sh` symlinks each file to its
 matching path, backing up any existing real file as `<file>.backup`. Files are
 grouped by the app they configure, and each app is one menu item. Things that
-are not config files — `fonts`, so far — are menu items too:
+are not config files — `fonts` and `nosleep` — are menu items too:
 
 ```
 ./install.sh                  # pick items from a menu
@@ -30,6 +30,7 @@ font is installed:
   3) zellij       [ 1/2  ] 2 files
   4) markdownlint [      ] 1 file
   5) fonts        [  ok  ] UbuntuMono Nerd Font
+  6) nosleep      [      ] awake on AC power
 ```
 
 With no terminal attached it installs everything, so it stays usable from
@@ -42,6 +43,19 @@ unpacking into `~/Library/Fonts` on macOS and `~/.local/share/fonts` (plus
 `fc-cache`) elsewhere. It skips a font that is already installed and honours
 `--dry-run`. The font name is the `nerd_font` variable; the release tag is
 pinned next to it and `NERD_FONT_VERSION` overrides it.
+
+`nosleep` keeps the machine running while it is on the power adapter, so a long
+background job is not cut short by an idle stretch or a closed lid. It sets two
+`pmset` values on the AC profile — `sleep 0` for the idle suspend and
+`disablesleep 1` for the lid-close one — and leaves the battery profile alone.
+Display sleep is untouched either way: the screen going dark does not stop
+anything running.
+
+It is the one item that needs `sudo`, and the only one that will ask for a
+password; with no terminal to ask on it prints `skip` rather than hanging. It is
+also macOS-only, so it is absent from the menu everywhere else. The values it
+replaces are written to `~/.config/dotfiles/nosleep.backup` first, which is what
+the uninstall reads to put them back — the same idea as a `<file>.backup`.
 
 Picking `ghostty` alone installs only its config — the font is a separate
 choice, so select `fonts` too (or `--all`).
@@ -60,7 +74,10 @@ choice, so select `fonts` too (or `--all`).
 Tracked configs are unlinked, any `<file>.backup` is moved back into place, and
 directories left empty are cleared (`rmdir` only touches an empty one, so a
 directory still holding anything of yours survives). `fonts` deletes the font
-files it installed and nothing else in the font directory.
+files it installed and nothing else in the font directory. `nosleep` restores
+the `pmset` values recorded at install time, then deletes the record; with no
+record — never installed, or cleared by hand — it reports `gone` and changes
+nothing, since there is no state it can safely return you to.
 
 Anything this repo did not create is left where it is, reported as `skip`: a
 real file at a tracked path, or a symlink pointing somewhere other than into

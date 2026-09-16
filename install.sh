@@ -5,7 +5,7 @@
 #
 # Files are grouped by the app they configure (zellij, nvim, claude-code, ...),
 # and each app is one item in the install menu. Items that are not config files
-# -- fonts, so far -- sit in `extras` alongside them.
+# -- fonts, and the macOS-only nosleep -- sit in `extras` alongside them.
 #
 # Run with no arguments to pick items from a menu, name items as arguments to
 # install just those, or use --all to install everything without prompting.
@@ -100,9 +100,18 @@ for app in "${file_apps[@]}"; do
   $known || apps+=("$app")
 done
 
+is_macos() {
+  [[ "$(uname -s)" == Darwin ]]
+}
+
 # Menu items that are not symlinked config files. Each needs a case in
-# label() and install_item().
+# label(), install_item() and uninstall_item().
 extras=(fonts)
+
+# nosleep drives pmset, which only exists on macOS.
+if is_macos; then
+  extras+=(nosleep)
+fi
 
 items=("${apps[@]}" "${extras[@]}")
 
@@ -123,7 +132,7 @@ files_of() {
 nerd_font=UbuntuMono
 
 font_dir() {
-  if [[ "$(uname -s)" == "Darwin" ]]; then
+  if is_macos; then
     echo "$HOME/Library/Fonts"
   else
     echo "${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
@@ -132,6 +141,50 @@ font_dir() {
 
 font_installed() {
   compgen -G "$(font_dir)/${nerd_font}NerdFont*.ttf" >/dev/null
+}
+
+# The pmset keys the nosleep item owns, and the AC-power value each takes while
+# it is installed, as parallel arrays. `sleep 0` stops the machine suspending
+# after an idle stretch; `disablesleep 1` stops the suspend a closed lid would
+# trigger. Both are needed to keep background work running, and neither touches
+# the battery profile.
+nosleep_keys=(sleep disablesleep)
+nosleep_values=(0 1)
+
+# What the keys held before we changed them, so uninstall can put them back.
+nosleep_backup="$HOME/.config/dotfiles/nosleep.backup"
+
+# The AC-power value of one pmset key. `disablesleep` is not part of that
+# profile's listing -- pmset reports it among the system-wide settings, and only
+# once it is on, so an absent line means 0.
+pmset_ac() {
+  if [[ "$1" == disablesleep ]]; then
+    pmset -g | awk '$1 == "SleepDisabled" { print $2; hit = 1 }
+                    END { if (!hit) print 0 }'
+    return
+  fi
+
+  pmset -g custom | awk -v key="$1" '
+    /^AC Power:/    { ac = 1; next }
+    /^[^[:space:]]/ { ac = 0 }
+    ac && $1 == key { print $2; exit }
+  '
+}
+
+nosleep_active() {
+  local i
+  for ((i = 0; i < ${#nosleep_keys[@]}; i++)); do
+    [[ "$(pmset_ac "${nosleep_keys[$i]}")" == "${nosleep_values[$i]}" ]] || return 1
+  done
+}
+
+# The owned keys and their current AC values on one line, for the log.
+nosleep_current() {
+  local key out=()
+  for key in "${nosleep_keys[@]}"; do
+    out+=("$key" "$(pmset_ac "$key")")
+  done
+  echo "${out[*]}"
 }
 
 is_linked() {
@@ -143,6 +196,7 @@ is_linked() {
 label() {
   case "$1" in
     fonts) label_fonts ;;
+    nosleep) label_nosleep ;;
     *) label_app "$1" ;;
   esac
 }
@@ -173,6 +227,13 @@ label_fonts() {
   local state="[      ]"
   font_installed && state="[  ok  ]"
   printf "%-${item_width}s %s %s Nerd Font\n" fonts "$state" "$nerd_font"
+}
+
+# "nosleep [  ok  ] awake on AC power"
+label_nosleep() {
+  local state="[      ]"
+  nosleep_active && state="[  ok  ]"
+  printf "%-${item_width}s %s awake on AC power\n" nosleep "$state"
 }
 
 link() {
@@ -254,6 +315,50 @@ install_nerd_font() {
   command -v fc-cache >/dev/null 2>&1 && fc-cache -f "$dir" >/dev/null
 
   return 0
+}
+
+# Stop the machine suspending while it is on the power adapter, so a long
+# background job survives an idle stretch or a closed lid. This is the one item
+# that needs root, so it is the one that can ask for a password -- when nothing
+# can answer, it is skipped rather than left hanging. The values being replaced
+# are written to $nosleep_backup first, the way a displaced config file is kept
+# as <file>.backup, and remove_nosleep reads them back.
+install_nosleep() {
+  local i key args=()
+
+  if nosleep_active; then
+    echo "  ok      already awake on AC power"
+    return
+  fi
+
+  for ((i = 0; i < ${#nosleep_keys[@]}; i++)); do
+    args+=("${nosleep_keys[$i]}" "${nosleep_values[$i]}")
+  done
+
+  if $dry_run; then
+    [[ -e "$nosleep_backup" ]] ||
+      echo "  would save AC $(nosleep_current) -> $nosleep_backup"
+    echo "  would run  sudo pmset -c ${args[*]}"
+    return
+  fi
+
+  if ! sudo -n true 2>/dev/null && [[ ! -t 0 ]]; then
+    echo "  skip    needs sudo, and there is no terminal to ask on"
+    return
+  fi
+
+  # Only the first install records a backup: a second one would capture the
+  # values we ourselves put there and make the uninstall a no-op.
+  if [[ ! -e "$nosleep_backup" ]]; then
+    mkdir -p "$(dirname "$nosleep_backup")"
+    for key in "${nosleep_keys[@]}"; do
+      echo "$key $(pmset_ac "$key")"
+    done >"$nosleep_backup"
+    echo "  backup  AC $(nosleep_current) -> $nosleep_backup"
+  fi
+
+  sudo pmset -c "${args[@]}"
+  echo "  pmset   AC ${args[*]}"
 }
 
 # Remove a symlink this repo owns, putting back whatever it displaced. Anything
@@ -339,11 +444,52 @@ remove_nerd_font() {
   return 0
 }
 
+# Put back the pmset values install_nosleep displaced. With no backup file --
+# never installed, or it was cleared by hand -- there is no recorded state to
+# return to, so the settings are left exactly as they are.
+remove_nosleep() {
+  local key value args=()
+
+  if [[ ! -e "$nosleep_backup" ]]; then
+    echo "  gone    nothing recorded in $nosleep_backup"
+    return
+  fi
+
+  while read -r key value; do
+    [[ -n "$key" ]] || continue
+    args+=("$key" "$value")
+  done <"$nosleep_backup"
+
+  if [[ ${#args[@]} -eq 0 ]]; then
+    echo "  skip    $nosleep_backup is empty"
+    return
+  fi
+
+  if $dry_run; then
+    echo "  would run    sudo pmset -c ${args[*]}"
+    echo "  would remove $nosleep_backup"
+    return
+  fi
+
+  if ! sudo -n true 2>/dev/null && [[ ! -t 0 ]]; then
+    echo "  skip    needs sudo, and there is no terminal to ask on"
+    return
+  fi
+
+  sudo pmset -c "${args[@]}"
+  echo "  pmset   AC ${args[*]}"
+
+  rm -f "$nosleep_backup"
+  echo "  remove  $nosleep_backup"
+  prune_dirs "$(dirname "$nosleep_backup")"
+}
+
 install_item() {
   local item="$1" file
   echo "$item"
   case "$item" in
     fonts) install_nerd_font "$nerd_font" ;;
+    nosleep) install_nosleep ;;
     *)
       while IFS= read -r file; do
         link "$file"
@@ -357,6 +503,7 @@ uninstall_item() {
   echo "$item"
   case "$item" in
     fonts) remove_nerd_font "$nerd_font" ;;
+    nosleep) remove_nosleep ;;
     *)
       while IFS= read -r file; do
         unlink_file "$file"

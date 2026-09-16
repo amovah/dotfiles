@@ -7,8 +7,9 @@
 #   ./uninstall.sh --dry-run       # preview, changes nothing
 #
 # Tracked configs are unlinked and any <file>.backup is moved back into place;
-# directories left empty are cleared; the Nerd Font is deleted. Anything this
-# repo did not create is left alone.
+# directories left empty are cleared; the Nerd Font is deleted; the pmset values
+# nosleep replaced are restored from what it recorded. Anything this repo did not
+# create is left alone.
 #
 # The work lives in install.sh behind --uninstall, so the two directions cannot
 # drift apart as items are added.
