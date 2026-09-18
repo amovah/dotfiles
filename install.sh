@@ -104,6 +104,22 @@ is_macos() {
   [[ "$(uname -s)" == Darwin ]]
 }
 
+# Where setup-blender-mcp.sh looks for Blender, mirrored so the menu can decide
+# whether to offer the item at all. Kept in the same order as that script.
+blender_bin() {
+  local candidate
+  for candidate in \
+    "${BLENDER_BIN:-}" \
+    /Applications/Blender.app/Contents/MacOS/Blender \
+    "$(command -v blender 2>/dev/null || true)"; do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Menu items that are not symlinked config files. Each needs a case in
 # label(), install_item() and uninstall_item().
 extras=(fonts)
@@ -111,6 +127,12 @@ extras=(fonts)
 # nosleep drives pmset, which only exists on macOS.
 if is_macos; then
   extras+=(nosleep)
+fi
+
+# blender-mcp installs a Blender add-on, so it is only offered on a machine
+# that has Blender. Hidden rather than failing, the way a menu should be.
+if blender_bin >/dev/null 2>&1; then
+  extras+=(blender-mcp)
 fi
 
 items=("${apps[@]}" "${extras[@]}")
@@ -130,6 +152,16 @@ files_of() {
 
 # The Nerd Font the ghostty config asks for.
 nerd_font=UbuntuMono
+
+# The official Blender Lab MCP server, wired into Claude Code, Codex and
+# OpenCode. setup-blender-mcp.sh owns all of it -- this item only drives that
+# script, so the two cannot describe different things.
+blender_mcp_setup="$repo_root/setup-blender-mcp.sh"
+blender_mcp_bin="$HOME/.local/share/blender-mcp/venv/bin/blender-mcp"
+
+blender_mcp_installed() {
+  [[ -x "$blender_mcp_bin" ]]
+}
 
 font_dir() {
   if is_macos; then
@@ -197,6 +229,7 @@ label() {
   case "$1" in
     fonts) label_fonts ;;
     nosleep) label_nosleep ;;
+    blender-mcp) label_blender_mcp ;;
     *) label_app "$1" ;;
   esac
 }
@@ -234,6 +267,14 @@ label_nosleep() {
   local state="[      ]"
   nosleep_active && state="[  ok  ]"
   printf "%-${item_width}s %s awake on AC power\n" nosleep "$state"
+}
+
+# "blender-mcp [  ok  ] Blender MCP server for claude/codex/opencode"
+label_blender_mcp() {
+  local state="[      ]"
+  blender_mcp_installed && state="[  ok  ]"
+  printf "%-${item_width}s %s Blender MCP server for claude/codex/opencode\n" \
+    blender-mcp "$state"
 }
 
 link() {
@@ -484,12 +525,35 @@ remove_nosleep() {
   prune_dirs "$(dirname "$nosleep_backup")"
 }
 
+# Hand off to setup-blender-mcp.sh, which resolves Blender and Python, builds
+# the server's venv, installs the add-on, and registers the three clients. It is
+# re-runnable, so this needs no already-installed short-circuit of its own.
+install_blender_mcp() {
+  local args=()
+  $dry_run && args+=(--dry-run)
+  "$blender_mcp_setup" ${args[@]+"${args[@]}"} 2>&1 | sed 's/^/  /'
+  return "${PIPESTATUS[0]}"
+}
+
+remove_blender_mcp() {
+  if ! blender_mcp_installed; then
+    echo "  gone    $blender_mcp_bin"
+    return
+  fi
+
+  local args=(--uninstall)
+  $dry_run && args+=(--dry-run)
+  "$blender_mcp_setup" "${args[@]}" 2>&1 | sed 's/^/  /'
+  return "${PIPESTATUS[0]}"
+}
+
 install_item() {
   local item="$1" file
   echo "$item"
   case "$item" in
     fonts) install_nerd_font "$nerd_font" ;;
     nosleep) install_nosleep ;;
+    blender-mcp) install_blender_mcp ;;
     *)
       while IFS= read -r file; do
         link "$file"
@@ -504,6 +568,7 @@ uninstall_item() {
   case "$item" in
     fonts) remove_nerd_font "$nerd_font" ;;
     nosleep) remove_nosleep ;;
+    blender-mcp) remove_blender_mcp ;;
     *)
       while IFS= read -r file; do
         unlink_file "$file"

@@ -8,7 +8,8 @@ commands below list both.
 Everything under `home/` mirrors `$HOME`. `install.sh` symlinks each file to its
 matching path, backing up any existing real file as `<file>.backup`. Files are
 grouped by the app they configure, and each app is one menu item. Things that
-are not config files — `fonts` and `nosleep` — are menu items too:
+are not config files — `fonts`, `nosleep` and `blender-mcp` — are menu items
+too:
 
 ```
 ./install.sh                  # pick items from a menu
@@ -31,6 +32,7 @@ font is installed:
   4) markdownlint [      ] 1 file
   5) fonts        [  ok  ] UbuntuMono Nerd Font
   6) nosleep      [      ] awake on AC power
+  7) blender-mcp  [  ok  ] Blender MCP server for claude/codex/opencode
 ```
 
 With no terminal attached it installs everything, so it stays usable from
@@ -57,6 +59,31 @@ also macOS-only, so it is absent from the menu everywhere else. The values it
 replaces are written to `~/.config/dotfiles/nosleep.backup` first, which is what
 the uninstall reads to put them back — the same idea as a `<file>.backup`.
 
+`blender-mcp` installs the [official Blender Lab MCP
+server](https://www.blender.org/lab/mcp-server/), letting Claude Code, Codex and
+OpenCode drive a running Blender — inspecting the scene, searching the `bpy` API
+docs it ships, running Python, and rendering. It is a thin wrapper over
+`setup-blender-mcp.sh`, which owns the whole job and can be run on its own:
+
+```
+./setup-blender-mcp.sh              # server, add-on, all three clients
+./setup-blender-mcp.sh claude       # register one client only
+./setup-blender-mcp.sh --uninstall
+```
+
+Two halves have to line up. The add-on runs inside Blender and needs 5.1 or
+newer; it is installed from the pinned release into Blender's built-in
+`user_default` repository, so no extra extension repository is registered. The
+server is a Python package needing 3.10+, which macOS does not ship, so it gets
+its own venv under `~/.local/share/blender-mcp` — `brew install python3` first
+if nothing new enough is around. Both halves are pinned to the same tag so they
+cannot drift. They talk over a TCP socket on `localhost:9876`, and the add-on
+starts listening a few seconds after Blender launches.
+
+The item is hidden on a machine with no Blender rather than offered and failed.
+Note that `execute_blender_code` runs model-written Python inside Blender with
+no sandbox, which is the upstream design — save your work first.
+
 Picking `ghostty` alone installs only its config — the font is a separate
 choice, so select `fonts` too (or `--all`).
 
@@ -77,7 +104,10 @@ directory still holding anything of yours survives). `fonts` deletes the font
 files it installed and nothing else in the font directory. `nosleep` restores
 the `pmset` values recorded at install time, then deletes the record; with no
 record — never installed, or cleared by hand — it reports `gone` and changes
-nothing, since there is no state it can safely return you to.
+nothing, since there is no state it can safely return you to. `blender-mcp`
+unregisters the three clients, removes the Blender add-on and deletes the venv;
+the Homebrew Python it may have installed is left alone, since other things
+will have picked it up by then.
 
 Anything this repo did not create is left where it is, reported as `skip`: a
 real file at a tracked path, or a symlink pointing somewhere other than into
