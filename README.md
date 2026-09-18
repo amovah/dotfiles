@@ -98,6 +98,7 @@ Tracked configs:
 | `zellij` | `home/.config/zellij/config.kdl` | `~/.config/zellij/config.kdl` |
 | `zellij` | `home/.config/zellij/layouts/dev.kdl` | `~/.config/zellij/layouts/dev.kdl` |
 | `ghostty` | `home/.config/ghostty/config` | `~/.config/ghostty/config` |
+| `fish` | `home/.config/fish/conf.d/homebrew-path.fish` | `~/.config/fish/conf.d/homebrew-path.fish` |
 | `fish` | `home/.config/fish/conf.d/sdkroot.fish` | `~/.config/fish/conf.d/sdkroot.fish` |
 | `markdownlint` | `home/.markdownlint-cli2.yaml` | `~/.markdownlint-cli2.yaml` |
 
@@ -122,6 +123,31 @@ Only drop-ins this repo owns are tracked — `config.fish` and the fisher-manage
 files in `conf.d/` (`_tide_init.fish`, `nvm.fish`) stay untracked. fish sources
 everything in `conf.d/` automatically, so a snippet needs no wiring in
 `config.fish`.
+
+`conf.d/homebrew-path.fish` puts `/opt/homebrew/bin` directly before
+`/usr/bin`. macOS runs `path_helper` for login shells, which appends the
+`/etc/paths.d` entries — Homebrew's among them — *after* `/usr/bin`, so every
+name Homebrew shares with an Apple one loses. `brew install python3` lands 3.14
+in `/opt/homebrew/bin` and `python3` still resolves to Apple's frozen 3.9.6;
+brew itself warns about it:
+
+```
+The following python@3.14 executables are shadowed by other commands
+earlier in your PATH:
+  pip3 (shadowed by /usr/bin/pip3)
+  python3 (shadowed by /usr/bin/python3)
+```
+
+`brew shellenv` fixes this by prepending to the very front, which would also put
+Homebrew ahead of `$fish_user_paths` and the nvm bin — so a later
+`brew install node` would quietly shadow the nvm-managed one, the same bug in
+the other direction. Inserting before `/usr/bin` beats the system copies and
+leaves every user-managed tool where it is. Apple's copies stay put, so macOS
+internals calling `/usr/bin/python3` by absolute path are unaffected.
+
+It edits `$PATH` directly rather than going through `$fish_user_paths`, which is
+a *universal* variable here — a global of that name would shadow it and silently
+drop the paths it holds.
 
 `conf.d/sdkroot.fish` pins `SDKROOT` to the Command Line Tools `MacOSX.sdk`
 symlink on macOS, and does nothing elsewhere. clang otherwise picks the
