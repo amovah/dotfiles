@@ -264,7 +264,7 @@ bindkey '^[[1;3C' forward-word
 [zellij](https://zellij.dev) — `brew install zellij` on macOS.
 
 Custom keybinds built on `clear-defaults=true`, with locked mode as the resting
-state (`Ctrl g` to leave it). A `dev` layout opens three tabs: nvim, claude, run.
+state (`Ctrl g` to leave it). A `dev` layout opens three tabs: nvim, codee agent, run.
 
 ```
 zellij --layout dev

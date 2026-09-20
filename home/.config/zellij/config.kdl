@@ -262,5 +262,5 @@ default_shell "fish"
 // Start locked, so keys reach nvim and the shell untouched (default: normal).
 default_mode "locked"
 
-// Open layouts/dev.kdl on startup: nvim, claude, run (default: "default").
+// Open layouts/dev.kdl on startup: nvim, codee agent, run (default: "default").
 default_layout "dev"
