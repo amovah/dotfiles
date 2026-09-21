@@ -11,7 +11,7 @@ layout {
     tab name="nvim" focus=true {
         pane command="nvim"
     }
-    tab name="codee agent" {
+    tab name="code agent" {
         pane
     }
     tab name="run" {
