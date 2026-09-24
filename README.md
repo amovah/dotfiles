@@ -130,6 +130,7 @@ Tracked configs:
 | `ghostty` | `home/.config/ghostty/config` | `~/.config/ghostty/config` |
 | `fish` | `home/.config/fish/conf.d/homebrew-path.fish` | `~/.config/fish/conf.d/homebrew-path.fish` |
 | `fish` | `home/.config/fish/conf.d/sdkroot.fish` | `~/.config/fish/conf.d/sdkroot.fish` |
+| `fish` | `home/.config/fish/conf.d/vi-mode.fish` | `~/.config/fish/conf.d/vi-mode.fish` |
 | `markdownlint` | `home/.markdownlint-cli2.yaml` | `~/.markdownlint-cli2.yaml` |
 
 App names come from the file path. `~/.config/<app>/...` names itself; anything
@@ -178,6 +179,11 @@ internals calling `/usr/bin/python3` by absolute path are unaffected.
 It edits `$PATH` directly rather than going through `$fish_user_paths`, which is
 a *universal* variable here — a global of that name would shadow it and silently
 drop the paths it holds.
+
+`conf.d/vi-mode.fish` switches the command line to vi key bindings in
+interactive shells, with the cursor shape showing the mode: a block in normal
+mode, a bar in insert, an underscore in replace. It sets `$fish_key_bindings` as
+a global, so it wins over anything `fish_config` saved as a universal.
 
 `conf.d/sdkroot.fish` pins `SDKROOT` to the Command Line Tools `MacOSX.sdk`
 symlink on macOS, and does nothing elsewhere. clang otherwise picks the
