@@ -131,11 +131,16 @@ Tracked configs:
 | `fish` | `home/.config/fish/conf.d/homebrew-path.fish` | `~/.config/fish/conf.d/homebrew-path.fish` |
 | `fish` | `home/.config/fish/conf.d/sdkroot.fish` | `~/.config/fish/conf.d/sdkroot.fish` |
 | `fish` | `home/.config/fish/conf.d/vi-mode.fish` | `~/.config/fish/conf.d/vi-mode.fish` |
+| `codex` | `home/.codex/config.toml` | `~/.codex/config.toml` |
 | `markdownlint` | `home/.markdownlint-cli2.yaml` | `~/.markdownlint-cli2.yaml` |
 
 App names come from the file path. `~/.config/<app>/...` names itself; anything
-else needs a case in `app_for()` in `install.sh` (`claude-code`, `markdownlint`,
-`git` are already mapped there).
+else needs a case in `app_for()` in `install.sh` (`codex`, `claude-code`,
+`markdownlint`, `git` are already mapped there). The Codex config selects
+Approve for me: workspace access with automatic review of eligible approval
+requests. Installing it backs up an existing `~/.codex/config.toml` before
+linking the tracked file; settings in that backup are not active while the
+tracked file is installed.
 
 Only customized files are tracked — install the [LazyVim
 starter](https://www.lazyvim.org/installation) first, then run `install.sh` to

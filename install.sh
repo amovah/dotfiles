@@ -68,6 +68,7 @@ app_for() {
     .config/nvim/*) echo nvim ;;
     .config/fish/*) echo fish ;;
     .config/ghostty/*) echo ghostty ;;
+    .codex/*) echo codex ;;
     .claude/* | .claude.json) echo claude-code ;;
     .markdownlint-cli2.* | .markdownlint.*) echo markdownlint ;;
     .gitconfig | .gitignore_global) echo git ;;
